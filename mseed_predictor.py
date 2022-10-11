@@ -11,7 +11,7 @@ from tensorflow.keras.optimizers import Adam
 import tensorflow as tf
 import matplotlib
 import tensorflow
-matplotlib.use('agg')
+# matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -381,6 +381,127 @@ def create_cct_model(inputs):
     '''
     return representation
 
+def create_cct_modelP(inputs):
+
+    inputs1 = convF1(inputs,   10, 11, 0.1)
+    inputs1 = convF1(inputs1, 20, 11, 0.1)
+    inputs1 = convF1(inputs1, 40, 11, 0.1)
+    
+    inputreshaped = layers.Reshape((6000,1,40))(inputs1)
+    # Augment data.
+    #augmented = data_augmentation(inputs)
+    # Create patches.
+    patches = Patches(patch_size)(inputreshaped)
+    # Encode patches.
+    encoded_patches = PatchEncoder(num_patches, projection_dim)(patches)
+    #print('done')
+        
+    # Calculate Stochastic Depth probabilities.
+    dpr = [x for x in np.linspace(0, stochastic_depth_rate, transformer_layers)]
+
+    # Create multiple layers of the Transformer block.
+    for i in range(transformer_layers):
+        #encoded_patches = convF1(encoded_patches, 40,11, 0.1)
+        # Layer normalization 1.
+        x1 = layers.LayerNormalization(epsilon=1e-6)(encoded_patches)
+
+        # Create a multi-head attention layer.
+        attention_output = layers.MultiHeadAttention(
+            num_heads=num_heads, key_dim=projection_dim, dropout=0.1
+        )(x1, x1)
+        #attention_output = convF1(attention_output, 40,11, 0.1)
+    
+
+        # Skip connection 1.
+        attention_output = StochasticDepth(dpr[i])(attention_output)
+        x2 = layers.Add()([attention_output, encoded_patches])
+
+        # Layer normalization 2.
+        x3 = layers.LayerNormalization(epsilon=1e-6)(x2)
+
+        # MLP.
+        x3 = mlp(x3, hidden_units=transformer_units, dropout_rate=0.1)
+
+        # Skip connection 2.
+        x3 = StochasticDepth(dpr[i])(x3)
+        encoded_patches = layers.Add()([x3, x2])
+
+    # Apply sequence pooling.
+    representation = layers.LayerNormalization(epsilon=1e-6)(encoded_patches)
+    #print(representation)
+    ''' 
+    attention_weights = tf.nn.softmax(layers.Dense(1)(representation), axis=1)
+    weighted_representation = tf.matmul(
+        attention_weights, representation, transpose_a=True
+    )
+    weighted_representation = tf.squeeze(weighted_representation, -2)
+
+    return weighted_representation
+    '''
+    return representation
+
+
+#def create_vit_classifier(inputs):
+def create_cct_modelS(inputs):
+
+    inputs1 = convF1(inputs,   10, 11, 0.1)
+    inputs1 = convF1(inputs1, 20, 11, 0.1)
+    inputs1 = convF1(inputs1, 40, 11, 0.1)
+    
+    inputreshaped = layers.Reshape((6000,1,40))(inputs1)
+    # Augment data.
+    #augmented = data_augmentation(inputs)
+    # Create patches.
+    patches = Patches(patch_size)(inputreshaped)
+    # Encode patches.
+    encoded_patches = PatchEncoder(num_patches, projection_dim)(patches)
+    #print('done')
+        
+    # Calculate Stochastic Depth probabilities.
+    dpr = [x for x in np.linspace(0, stochastic_depth_rate, transformer_layers)]
+
+    # Create multiple layers of the Transformer block.
+    for i in range(transformer_layers):
+        encoded_patches = convF1(encoded_patches, 40,11, 0.1)
+        # Layer normalization 1.
+        x1 = layers.LayerNormalization(epsilon=1e-6)(encoded_patches)
+
+        # Create a multi-head attention layer.
+        attention_output = layers.MultiHeadAttention(
+            num_heads=num_heads, key_dim=projection_dim, dropout=0.1
+        )(x1, x1)
+        attention_output = convF1(attention_output, 40,11, 0.1)
+    
+
+        # Skip connection 1.
+        attention_output = StochasticDepth(dpr[i])(attention_output)
+        x2 = layers.Add()([attention_output, encoded_patches])
+
+        # Layer normalization 2.
+        x3 = layers.LayerNormalization(epsilon=1e-6)(x2)
+
+        # MLP.
+        x3 = mlp(x3, hidden_units=transformer_units, dropout_rate=0.1)
+
+        # Skip connection 2.
+        x3 = StochasticDepth(dpr[i])(x3)
+        encoded_patches = layers.Add()([x3, x2])
+
+    # Apply sequence pooling.
+    representation = layers.LayerNormalization(epsilon=1e-6)(encoded_patches)
+    #print(representation)
+    ''' 
+    attention_weights = tf.nn.softmax(layers.Dense(1)(representation), axis=1)
+    weighted_representation = tf.matmul(
+        attention_weights, representation, transpose_a=True
+    )
+    weighted_representation = tf.squeeze(weighted_representation, -2)
+
+    return weighted_representation
+    '''
+    return representation
+
+
 def mseed_predictor(input_dir='downloads_mseeds',
               input_model="sampleData&Model/EqT1D8pre_048.h5",
               stations_json= "station_list.json",
@@ -664,7 +785,300 @@ def mseed_predictor(input_dir='downloads_mseeds',
 
        
         
+def mseed_predictor_two(input_dir='downloads_mseeds',
+              input_modelP="sampleData&Model/EqT1D8pre_048.h5",
+              input_modelS="sampleData&Model/EqT1D8pre_048.h5",
+              stations_json= "station_list.json",
+              output_dir="detections",
+              P_threshold=0.1,
+              S_threshold=0.1, 
+              number_of_plots=10,
+              normalization_mode='std',
+              batch_size=500,              
+              overlap = 0.3,
+              gpuid=None,
+              gpu_limit=None,
+              overwrite=False): 
+    
+    """ 
+    
+    To perform fast detection directly on mseed data.
+    
+    Parameters
+    ----------
+    input_dir: str
+        Directory name containing hdf5 and csv files-preprocessed data.
+            
+    input_model: str
+        Path to a trained model.
+            
+    stations_json: str
+        Path to a JSON file containing station information. 
+           
+    output_dir: str
+        Output directory that will be generated.
+            
+    P_threshold: float, default=0.1
+        A value which the P probabilities above it will be considered as P arrival.                
+            
+    S_threshold: float, default=0.1
+        A value which the S probabilities above it will be considered as S arrival.
+            
+    normalization_mode: str, default=std
+        Mode of normalization for data preprocessing max maximum amplitude among three components std standard deviation.
+             
+    batch_size: int, default=500
+        Batch size. This wont affect the speed much but can affect the performance. A value beteen 200 to 1000 is recommanded.
+             
+    overlap: float, default=0.3
+        If set the detection and picking are performed in overlapping windows.
+             
+    gpuid: int
+        Id of GPU used for the prediction. If using CPU set to None.        
+             
+    gpu_limit: int
+       Set the maximum percentage of memory usage for the GPU. 
+
+    overwrite: Bolean, default=False
+        Overwrite your results automatically.
+           
+    Returns
+    --------        
+    
+    
+    """  
         
+ 
+    args = {
+    "input_dir": input_dir,
+    "input_modelP": input_modelP,
+    "input_modelS": input_modelS,
+    "stations_json": stations_json,
+    "output_dir": output_dir,
+    "P_threshold": P_threshold,
+    "S_threshold": S_threshold,
+    "normalization_mode": normalization_mode,
+    "overlap": overlap,
+    "batch_size": batch_size,    
+    "gpuid": gpuid,
+    "gpu_limit": gpu_limit 
+    }        
+        
+    if args['gpuid']:     
+        os.environ['CUDA_VISIBLE_DEVICES'] = '{}'.format(args['gpuid'])
+        tf.Session(config=tf.ConfigProto(log_device_placement=True))
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        config.gpu_options.per_process_gpu_memory_fraction = float(args['gpu_limit']) 
+        K.tensorflow_backend.set_session(tf.Session(config=config))          
+
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)s [%(levelname)s] [%(name)s] %(message)s',
+                        datefmt='%m-%d %H:%M') 
+
+    class DummyFile(object):
+        file = None
+        def __init__(self, file, **kwargs):
+            self.file = file
+    
+        def write(self, x):
+            # Avoid print() second call (useless \n)
+            if len(x.rstrip()) > 0:
+                tqdm.write(x, file=self.file)
+    
+    @contextlib.contextmanager
+    def nostdout():
+        save_stdout = sys.stdout
+        sys.stdout = DummyFile(sys.stdout)
+        yield
+        sys.stdout = save_stdout
+    
+ 
+    # print('============================================================================')
+    eqt_logger = logging.getLogger("EQCCT_Picker")
+    eqt_logger.info(f"Running EQCCT_Picker")
+            
+    eqt_logger.info(f"*** Loading the model ...")
+
+    # Model CCT
+    inputs = layers.Input(shape=input_shape,name='input')
+
+    #featuresP = create_cct_model(inputs)
+    #featuresS = create_cct_model(inputs)
+
+
+    #logitp  = Dense(6000 ,activation='sigmoid', kernel_initializer='he_normal',name='picker_P1')(featuresP)
+    #logits  = Dense(6000 ,activation='sigmoid', kernel_initializer='he_normal',name='picker_S1')(featuresS)
+    #logitp = Reshape((6000,1), name='picker_P')(logitp)
+    #logits = Reshape((6000,1), name='picker_S')(logits)
+
+
+    featuresP = create_cct_modelP(inputs)
+    featuresP = Reshape((6000,1))(featuresP)
+
+    featuresS = create_cct_modelS(inputs)
+    featuresS = Reshape((6000,1))(featuresS)
+
+    logitp  = Conv1D(1,  15, strides =(1), padding='same',activation='sigmoid', kernel_initializer='he_normal',name='picker_P')(featuresP)
+    logits  = Conv1D(1,  15, strides =(1), padding='same',activation='sigmoid', kernel_initializer='he_normal',name='picker_S')(featuresS)
+
+
+
+    modelP = Model(inputs=[inputs], outputs=[logitp])
+    modelS = Model(inputs=[inputs], outputs=[logits])
+
+    model = Model(inputs=[inputs], outputs=[logitp,logits])
+    model.summary()
+
+    sgd = optimizers.Adam()
+    model.compile(optimizer=sgd,
+                  loss=['binary_crossentropy','binary_crossentropy'],
+                  metrics=['acc',f1,precision, recall])    
+    
+    modelP.load_weights(args['input_modelP'])
+    modelS.load_weights(args['input_modelS'])
+
+
+    eqt_logger.info(f"*** Loading is complete!")
+
+
+    out_dir = os.path.join(os.getcwd(), str(args['output_dir']))
+    if os.path.isdir(out_dir):
+        # print('============================================================================')        
+        # print(f' *** {out_dir} already exists!')
+        eqt_logger.info(f"*** {out_dir} already exists!")
+        if overwrite == True:
+            inp = "y"
+            eqt_logger.info(f"Overwriting your previous results")
+            # print("Overwriting your previous results")
+        else:
+            inp = input(" --> Type (Yes or y) to create a new empty directory! This will erase your previous results so make a copy if you want them.")
+        if inp.lower() == "yes" or inp.lower() == "y":
+            shutil.rmtree(out_dir)  
+            os.makedirs(out_dir) 
+        else:
+            print("Okay.")
+            return
+     
+    if platform.system() == 'Windows':
+        station_list = [ev.split(".")[0] for ev in listdir(args['input_dir']) if ev.split("\\")[-1] != ".DS_Store"];
+    else:     
+        station_list = [ev.split(".")[0] for ev in listdir(args['input_dir']) if ev.split("/")[-1] != ".DS_Store"];
+        
+
+    station_list = sorted(set(station_list))
+    
+    data_track = dict()
+
+    # print(f"######### There are files for {len(station_list)} stations in {args['input_dir']} directory. #########", flush=True)
+    eqt_logger.info(f"There are files for {len(station_list)} stations in {args['input_dir']} directory.")
+    for ct, st in enumerate(station_list):
+    
+        save_dir = os.path.join(out_dir, str(st)+'_outputs')
+        save_figs = os.path.join(save_dir, 'figures') 
+        if os.path.isdir(save_dir):
+            shutil.rmtree(save_dir)  
+        os.makedirs(save_dir) 
+        #if args['number_of_plots']:
+        #    os.makedirs(save_figs)
+            
+        plt_n = 0            
+        csvPr_gen = open(os.path.join(save_dir,'X_prediction_results.csv'), 'w')          
+        predict_writer = csv.writer(csvPr_gen, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        predict_writer.writerow(['file_name', 
+                                 'network',
+                                 'station',
+                                 'instrument_type',
+                                 'station_lat',
+                                 'station_lon',
+                                 'station_elv',
+                                 'p_arrival_time',
+                                 'p_probability',
+                                 's_arrival_time',
+                                 's_probability'])  
+        csvPr_gen.flush()
+        # print(f'========= Started working on {st}, {ct+1} out of {len(station_list)} ...', flush=True)
+        eqt_logger.info(f"Started working on {st}, {ct+1} out of {len(station_list)} ...")
+        
+
+        start_Predicting = time.time()       
+        if platform.system() == 'Windows':
+            file_list = [join(st, ev) for ev in listdir(args["input_dir"]+"\\"+st) if ev.split("\\")[-1].split(".")[-1].lower() == "mseed"]; 
+        else:
+            file_list = [join(st, ev) for ev in listdir(args["input_dir"]+"/"+st) if ev.split("/")[-1].split(".")[-1].lower() == "mseed"]; 
+        
+        mon = [ev.split('__')[1]+'__'+ev.split('__')[2] for ev in file_list ];
+        uni_list = list(set(mon))
+        uni_list.sort()  
+          
+        time_slots, comp_types = [], []
+        
+        # print('============ Station {} has {} chunks of data.'.format(st, len(uni_list)), flush=True)      
+        for _, month in enumerate(uni_list):
+            eqt_logger.info(f"{month}")
+            matching = [s for s in file_list if month in s]
+            matching.sort()
+            #print(matching)
+            meta, time_slots, comp_types, data_set = _mseed2nparry(args, matching, time_slots, comp_types, st)
+
+            params_pred = {'batch_size': args['batch_size'],
+                           'norm_mode': args['normalization_mode']}  
+                
+            pred_generator = PreLoadGeneratorTest(meta["trace_start_time"], data_set, **params_pred)
+
+            predP,predS = model.predict_generator(pred_generator)
+            
+            #print(np.shape(predP))
+            detection_memory = []
+            prob_memory=[]
+            for ix in range(len(predP)):
+                Ppicks, Pprob =  _picker(args, predP[ix,:, 0])   
+                Spicks, Sprob =  _picker(args, predS[ix,:, 0]) 
+                #print(np.shape(Ppicks))
+                detection_memory,prob_memory=_output_writter_prediction(meta, csvPr_gen, Ppicks, Pprob, Spicks, Sprob, detection_memory,prob_memory,predict_writer, ix,len(predP),len(predS))
+        
+                                                       
+        end_Predicting = time.time() 
+        data_track[st]=[time_slots, comp_types] 
+        delta = (end_Predicting - start_Predicting) 
+        hour = int(delta / 3600)
+        delta -= hour * 3600
+        minute = int(delta / 60)
+        delta -= minute * 60
+        seconds = delta     
+                        
+        dd = pd.read_csv(os.path.join(save_dir,'X_prediction_results.csv'))
+        print(f'\n', flush=True)
+        eqt_logger.info(f"Finished the prediction in: {hour} hours and {minute} minutes and {round(seconds, 2)} seconds.")
+        eqt_logger.info(f'*** Detected: '+str(len(dd))+' events.')
+        eqt_logger.info(f' *** Wrote the results into --> " ' + str(save_dir)+' "')
+        # print(' *** Finished the prediction in: {} hours and {} minutes and {} seconds.'.format(hour, minute, round(seconds, 2)), flush=True)         
+        # print(' *** Detected: '+str(len(dd))+' events.', flush=True)
+        # print(' *** Wrote the results into --> " ' + str(save_dir)+' "', flush=True)
+        
+        with open(os.path.join(save_dir,'X_report.txt'), 'a') as the_file: 
+            the_file.write('================== PREDICTION FROM MSEED ===================='+'\n')               
+            the_file.write('================== Overal Info =============================='+'\n')               
+            the_file.write('date of report: '+str(datetime.now())+'\n')         
+            the_file.write('input_dir: '+str(args['input_dir'])+'\n')  
+            the_file.write('output_dir: '+str(save_dir)+'\n')  
+            the_file.write('================== Prediction Parameters ====================='+'\n')  
+            the_file.write('finished the prediction in:  {} hours and {} minutes and {} seconds \n'.format(hour, minute, round(seconds, 2))) 
+            #the_file.write('loss_types: '+str(args['loss_types'])+'\n')
+            #the_file.write('loss_weights: '+str(args['loss_weights'])+'\n')
+            the_file.write('================== Other Parameters =========================='+'\n')            
+            the_file.write('normalization_mode: '+str(args['normalization_mode'])+'\n')
+            the_file.write('overlap: '+str(args['overlap'])+'\n')  
+            the_file.write('batch_size: '+str(args['batch_size'])+'\n')                                 
+            #the_file.write('detection_threshold: '+str(args['detection_threshold'])+'\n')            
+            #the_file.write('number_of_plots: '+str(args['number_of_plots'])+'\n')                        
+            the_file.write('gpuid: '+str(args['gpuid'])+'\n')
+            the_file.write('gpu_limit: '+str(args['gpu_limit'])+'\n')    
+  
+    with open('time_tracks.pkl', 'wb') as f:
+        pickle.dump(data_track, f, pickle.HIGHEST_PROTOCOL)
+
+
 def _mseed2nparry(args, matching, time_slots, comp_types, st_name):
     ' read miniseed files and from a list of string names and returns 3 dictionaries of numpy arrays, meta data, and time slice info'
     
