@@ -10,7 +10,7 @@
 ## Reference
 If you find this package useful, please do not forget to cite the following paper.
 
-    Saad, O.M., Chen, Y.F., Siervo, D., Zhang, F., Savvaidis, A., Huang, G., Igonin, N., Fomel, S., and Chen, Y., (2023). EQCCT: A production-ready EarthQuake detection and phase picking method using the Compact Convolutional Transformer, under review.
+    Saad, O.M., Chen, Y.F., Siervo, D., Zhang, F., Savvaidis, A., Huang, G., Igonin, N., Fomel, S., and Chen, Y., (2023). EQCCT: A production-ready EarthQuake detection and phase picking method using the Compact Convolutional Transformer, IEEE Transactions on Geoscience and Remote Sensing, 61, 4504212.
     
 BibTeX:
 	
