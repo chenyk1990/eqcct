@@ -1,6 +1,3 @@
-
-
-
 from __future__ import print_function
 from __future__ import division
 import os
@@ -737,7 +734,7 @@ def mseed_predictor(input_dir='downloads_mseeds',
             prob_memory=[]
             for ix in range(len(predP)):
                 Ppicks, Pprob =  _picker(args, predP[ix,:, 0])   
-                Spicks, Sprob =  _picker(args, predS[ix,:, 0]) 
+                Spicks, Sprob =  _picker(args, predS[ix,:, 0], 'S_threshold') 
                 #print(np.shape(Ppicks))
                 detection_memory,prob_memory=_output_writter_prediction(meta, csvPr_gen, Ppicks, Pprob, Spicks, Sprob, detection_memory,prob_memory,predict_writer, ix,len(predP),len(predS))
         
@@ -1104,7 +1101,7 @@ def _mseed2nparry(args, matching, time_slots, comp_types, st_name):
         
     #print(st)          
     st.filter(type='bandpass', freqmin = 1.0, freqmax = 45, corners=2, zerophase=True)
-    st.taper(max_percentage=0.001, type='cosine', max_length=2) 
+    st.taper(max_percentage=0.001, type='cosine', max_length=2)
     if len([tr for tr in st if tr.stats.sampling_rate != 100.0]) != 0:
         try:
             st.interpolate(100, method="linear")
@@ -1554,9 +1551,8 @@ def _detect_peaks(x, mph=None, mpd=1, threshold=0, edge='rising', kpsh=False, va
 
 
 
-def _picker(args, yh3):
+def _picker(args, yh3, thr_type='P_threshold'):
     """ 
-    
     Performs detection and picking.
 
     Parameters
@@ -1566,26 +1562,19 @@ def _picker(args, yh3):
         
     yh1 : 1D array
          probability. 
-        
 
-   
     Returns
     --------    
     Ppickall: Pick.
     Pproball: Pick Probability.                           
                 
-    """               
-        
-
-
+    """
     P_PICKall=[]
     Ppickall=[]
     Pproball = []
     perrorall=[]
 
-
-
-    sP_arr = _detect_peaks(yh3, mph=args['P_threshold'], mpd=1)
+    sP_arr = _detect_peaks(yh3, mph=args[thr_type], mpd=1)
 
     P_PICKS = []
     pick_errors = []
