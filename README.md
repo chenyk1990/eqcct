@@ -22,7 +22,7 @@ BibTeX:
 	  year=2023,
 	  volume=61,
 	  issue=12,
-	  pages={in press},
+	  pages={4507015},
 	  doi={10.1109/TGRS.2023.3319440},
 	}
 
