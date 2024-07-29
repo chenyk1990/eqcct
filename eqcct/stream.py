@@ -449,7 +449,7 @@ def create_cct_modelS(inputs):
     '''
     return representation
 
-def mseed_predictor(input_modelP="sampleData&Model/EqT1D8pre_048.h5",
+def st_predictor(input_modelP="sampleData&Model/EqT1D8pre_048.h5",
               input_modelS="sampleData&Model/EqT1D8pre_048.h5",
               stinput="temp",
               output_dir="detections",
