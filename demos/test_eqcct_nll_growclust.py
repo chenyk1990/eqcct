@@ -4,9 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import FormatStrFormatter
 
-from pylib.geometry import point2line
-from pylib.texnet import create_catalog
-from pylib.texnet import win_catalog
+# from pylib.texnet import create_catalog
+# from pylib.texnet import win_catalog
 import obspy.core.utcdatetime as utc
 
 #

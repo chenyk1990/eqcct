@@ -58,6 +58,7 @@ setup(
         "pandas==1.3.5",
         "protobuf==3.20.1"
     ],
+    python_requires='==3.7.16',
     extras_require={
         "docs": ["sphinx", "ipython", "runipy"]
     }
