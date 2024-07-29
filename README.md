@@ -68,7 +68,7 @@ Using the latest version
 
 -----------
 ## Examples
-	1. Pick the P/S arrivals from an arbitrary waveform (stream) containing an earthquake
+1. Pick the P/S arrivals from an arbitrary waveform (stream) containing an earthquake
 	
 	import obspy.core.utcdatetime as utc
 	from obspy.clients.fdsn import Client
@@ -107,7 +107,7 @@ Using the latest version
 	plot_traces(st,axoff=1,titleoff=1,ptime= [obspy.UTCDateTime(pat[0]),obspy.UTCDateTime(pat[0]),obspy.UTCDateTime(pat[0])],stime=[obspy.UTCDateTime(sat[0]),obspy.UTCDateTime(sat[0]),obspy.UTCDateTime(sat[0])],figname='test_eqcct_texnet2022yplg.png',dpi=500);
 
     
-    2. Japanese data example (The Ipython Notebooks are examples for playing with the models.)
+2. Japanese data example (The Ipython Notebooks are examples for playing with the models.)
     
     Please first download the mseed data from
     https://drive.google.com/drive/folders/1jAkW4kOvwUDYxXW-ty3BTY81fjLF7sKE?usp=share_link
