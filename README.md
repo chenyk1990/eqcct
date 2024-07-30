@@ -62,7 +62,7 @@ First set up the environment and install the dependency packages
 	conda create -n eqcct python=3.7.16
 	conda activate eqcct
 	conda install ipython notebook
-	pip install obspy tqdm matplotlib-scalebar tensorflow==2.8.0 protobuf==3.20.1 pandas==1.3.5 
+	pip install obspy tqdm matplotlib-scalebar tensorflow==2.8.0 protobuf==3.20.1 pandas==1.3.5 scikit-learn==1.0.2
 	
 Then install EQCCT using the latest version
 
