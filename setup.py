@@ -56,7 +56,8 @@ setup(
         "obspy",
         "tensorflow==2.8.0",
         "pandas==1.3.5",
-        "protobuf==3.20.1"
+        "protobuf==3.20.1",
+        "scikit-learn==1.0.2"
     ],
     python_requires='==3.7.16',
     extras_require={
