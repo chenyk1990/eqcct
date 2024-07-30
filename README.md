@@ -62,9 +62,19 @@ Using the latest version
 	conda create -n eqcct python=3.7.16
 	conda activate eqcct
 	conda install ipython notebook
-	conda install obspy tqdm tensorflow==2.8.0 protobuf==3.20.1 pandas==1.3.5 
+	pip install obspy tqdm tensorflow==2.8.0 protobuf==3.20.1 pandas==1.3.5 
 	
+Then install EQCCT using the latest version
     git clone https://github.com/chenyk1990/eqcct
+    cd eqcct
+    pip install -v -e .
+    
+Or using Pypi
+	pip install eqcct
+	
+Or using pip directly from Github
+
+	pip install git+https://github.com/chenyk1990/eqcct
 
 -----------
 ## Examples
