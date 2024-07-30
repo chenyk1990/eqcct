@@ -57,7 +57,7 @@ The accepted version of the paper can be downloaded from:
 -----------
 
 ## Install
-Using the latest version
+First set up the environment and install the dependency packages
 
 	conda create -n eqcct python=3.7.16
 	conda activate eqcct
