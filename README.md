@@ -61,7 +61,7 @@ Using the latest version
 
 	conda create -n eqcct python=3.7.16
 	conda activate eqcct
-	conda install ipython
+	conda install ipython notebook
 	conda install obspy tqdm tensorflow==2.8.0 protobuf==3.20.1 pandas==1.3.5 
 	
     git clone https://github.com/chenyk1990/eqcct
@@ -116,8 +116,8 @@ Using the latest version
     https://drive.google.com/drive/folders/1KK16j1-WbwqKfTvh5gJbzJrX0fiayhl6?usp=share_link
     
     Then run the notebook 
-    Predict_MSEED_Japan.ipynb for the single-model (P and S together) example
-    Predict_MSEED_Japan_PS.ipynb for the double-model (P and S separately) example
+    notebooks/Test_Predict_MSEED_Japan.ipynb for the single-model (P and S together) example
+    notebooks/Test_Predict_MSEED_Japan_PS.ipynb for the double-model (P and S separately) example
 
     
 -----------
