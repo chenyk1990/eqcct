@@ -65,11 +65,13 @@ Using the latest version
 	pip install obspy tqdm matplotlib-scalebar tensorflow==2.8.0 protobuf==3.20.1 pandas==1.3.5 
 	
 Then install EQCCT using the latest version
+
     git clone https://github.com/chenyk1990/eqcct
     cd eqcct
     pip install -v -e .
     
 Or using Pypi
+
 	pip install eqcct
 	
 Or using pip directly from Github
