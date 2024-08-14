@@ -221,8 +221,7 @@ ax.add_collection(beach2020galz)
 plt.plot(lonm,latm,'*g',markersize=10);plt.text(lonm,latm,'M4.9',color='g',fontsize=10);
 plt.plot(lonc,latc,'*g',markersize=10);plt.text(lonc,latc,'M5.4',color='g',fontsize=10);
 addcounty()
-
-plt.savefig('test_eqcct_relo_manualvsAI_locvsreloc_onemonth.png',format='png',dpi=300)
+plt.savefig('test_eqcct_relo_manualvsAI_oneyear.png',format='png',dpi=300)
 plt.show()
 
 
@@ -294,8 +293,7 @@ ax.add_collection(beach2020galz)
 plt.plot(lonm,latm,'*g',markersize=10);plt.text(lonm,latm,'M4.9',color='g',fontsize=10);
 plt.plot(lonc,latc,'*g',markersize=10);plt.text(lonc,latc,'M5.4',color='g',fontsize=10);
 addcounty()
-
-plt.savefig('test_eqcct_relo_manualvsAI_oneyear.png',format='png',dpi=300)
+plt.savefig('test_eqcct_relo_manualvsAI_locvsreloc_onemonth.png',format='png',dpi=300)
 plt.show()
 
 
