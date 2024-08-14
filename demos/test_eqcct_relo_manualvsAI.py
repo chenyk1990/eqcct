@@ -1,12 +1,11 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
-from pylib.geometry import point2line
 from matplotlib.ticker import FormatStrFormatter
-from pylib.texnet import read_events
 # pip install matplotlib-scalebar
 from matplotlib_scalebar.scalebar import ScaleBar
 import obspy
+from obspy.imaging.beachball import beach
 
 e=obspy.read_events('../data/qmls/texnet2020galz.qml');lonm=e[0].origins[0].longitude;latm=e[0].origins[0].latitude;
 nop=[110.0, 47.0, -108.0];
@@ -16,7 +15,7 @@ nopm=[96.0, 43.0, -100.0];
 
 def addcounty():
 ##red county lines
-	f=open(os.getenv('HOME')+'/chenyk.data2/various/cyksmall/Culberson_XY.txt','r')
+	f=open('../data/texas/Culberson_XY.txt','r')
 	# f=open('Culberson_XY.txt','r')
 	clines=f.readlines()
 	clines=[ii.rstrip().split(' ') for ii in clines]
@@ -34,51 +33,25 @@ def addcounty():
 	plt.text(-104.0,31.3,'Reeves',fontsize=10,color='#929591')
 	scalebar = ScaleBar(110000,location='lower left');plt.gca().add_artist(scalebar)
 	
-def addcounty2():
-##red county lines
-	f=open(os.getenv('HOME')+'/chenyk.data2/various/cyksmall/Culberson_XY.txt','r')
-	# f=open('Culberson_XY.txt','r')
-	clines=f.readlines()
-	clines=[ii.rstrip().split(' ') for ii in clines]
-	##add county lines
-	tmp=[]
-	for ii in range(len(clines)):
-		if clines[ii] != ['']:
-			tmp.append(clines[ii])
-		else:
-			tmp=np.array(tmp,dtype='float32')
-			plt.plot(tmp[:,0],tmp[:,1],'-',color='#929591')
-			ii=ii+1;
-			tmp=[];
-	plt.text(-104.3,31.53,'Culberson',fontsize=10,color='#929591')
-	plt.text(-104.0,31.53,'Reeves',fontsize=10,color='#929591')
-	scalebar = ScaleBar(110000,location='lower left');plt.gca().add_artist(scalebar)
 ## Test eid info
 # from pylib.texnet import read_events as my_events
 # # eids=['texnet2022wmmd','texnet2022wmog','texnet2022wrbx','texnet2022xaxp','texnet2022xaxs']
 # # cat=my_events(eids)
-from pylib.texnet import eventlist as myevelist
-eids=['texnet2022wmmd','texnet2022wmog','texnet2022wrbx','texnet2022xaxp','texnet2022xaxs']
-eve=myevelist(eids)
+# from pylib.texnet import eventlist as myevelist
+# eids=['texnet2022wmmd','texnet2022wmog','texnet2022wrbx','texnet2022xaxp','texnet2022xaxs']
+# eve=myevelist(eids)
+# 
 
-from obspy.imaging.beachball import beach
-nop=[float(eve[1].split(',')[19]),float(eve[1].split(',')[20]),float(eve[1].split(',')[21])]
-nop1=[float(eve[1].split(',')[22]),float(eve[1].split(',')[23]),float(eve[1].split(',')[24])]
-print(nop,nop1)
+# nop=[float(eve[1].split(',')[19]),float(eve[1].split(',')[20]),float(eve[1].split(',')[21])]
+# nop1=[float(eve[1].split(',')[22]),float(eve[1].split(',')[23]),float(eve[1].split(',')[24])]
+# print(nop,nop1)
+# 
+# eve=myevelist(['texnet2020galz'])
+# nopm=[float(eve[1].split(',')[19]),float(eve[1].split(',')[20]),float(eve[1].split(',')[21])]
 
-eve=myevelist(['texnet2020galz'])
-nopm=[float(eve[1].split(',')[19]),float(eve[1].split(',')[20]),float(eve[1].split(',')[21])]
-
-#
-# column meaning: 
-# all columns in GC file
-# allcols = ["yr","mon","dy","hr","min","sec","evid","rlat","rlon","rdep","mag",
-# "qix", "cix", "nb", "npair", "ndiffP","ndiffS","rmsP","rmsS","eh","ez","et",
-# "clat","clon","cdep"]
 
 ## 2022/08
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/delaware11140_growclust-cat-cc0.65-ngood6.txt'
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet/CMEZNLLGROWCLUST/delaware202208xml_growclust-cat-cc0.65-ngood6.txt'
+## From depth-corrected EQCCT catalog
 fname='../data/catalogs/delaware202208xml_growclust-cat-cc0.65-ngood6.txt'
 
 fid=open(fname,'r')
@@ -104,9 +77,6 @@ lons2=[float(ii.split()[8]) for ii in lines if float(ii.split()[13])>=2]
 deps2=[float(ii.split()[9]) for ii in lines if float(ii.split()[13])>=2]
 
 ## 2022/09
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/delaware10867_growclust-cat-cc0.65-ngood6.txt'
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet/CMEZNLLGROWCLUST/delaware202209xml_growclust-cat-cc0.65-ngood6.txt'
-
 ## From depth-corrected EQCCT catalog
 fname='../data/catalogs/delaware202209xml_growclust-cat-cc0.65-ngood6.txt'
 fid=open(fname,'r')
@@ -120,10 +90,8 @@ lons22=[float(ii.split()[8]) for ii in lines if float(ii.split()[13])>=2]
 deps22=[float(ii.split()[9]) for ii in lines if float(ii.split()[13])>=2]
 
 ## 2022/10
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/delaware11687_growclust-cat-cc0.65-ngood6.txt'
 ## From depth-corrected EQCCT catalog
 fname='../data/catalogs/delaware202210xml_growclust-cat-cc0.65-ngood6.txt'
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet/CMEZNLLGROWCLUST/delaware202210xml_growclust-cat-cc0.65-ngood6.txt'
 fid=open(fname,'r')
 lines=fid.readlines()
 lats111=[float(ii.split()[22]) for ii in lines]
@@ -135,7 +103,7 @@ lons222=[float(ii.split()[8]) for ii in lines if float(ii.split()[13])>=2]
 deps222=[float(ii.split()[9]) for ii in lines if float(ii.split()[13])>=2]
 
 ## Texnet 1 year
-fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet_reloc/texnet_events_20211201_20221201_growclust-cat-cc0.65-ngood6.txt'
+fname='../data/catalogs/texnet_events_20211201_20221201_growclust-cat-cc0.65-ngood6.txt'
 fid=open(fname,'r')
 lines=fid.readlines()
 latsoy=[float(ii.split()[22]) for ii in lines] #oy: one year
@@ -146,9 +114,8 @@ latsoyr=[float(ii.split()[7]) for ii in lines if float(ii.split()[13])>=2] #oyr:
 lonsoyr=[float(ii.split()[8]) for ii in lines if float(ii.split()[13])>=2]
 depsoyr=[float(ii.split()[9]) for ii in lines if float(ii.split()[13])>=2]
 
-# Texnet 1 month (10)
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet_reloc/texnet_events_20221001_20221101_growclust-cat-cc0.65-ngood6.txt'
 ## From Relocated TexNet Catalog
+# Texnet 1 month (10)
 fname='../data/catalogs/texnet_events_20221001_20221101_growclust-cat-cc0.65-ngood6.txt'
 fid=open(fname,'r')
 lines=fid.readlines()
@@ -160,9 +127,7 @@ lonsomr10=[float(ii.split()[8]) for ii in lines if float(ii.split()[13])>=2]
 depsomr10=[float(ii.split()[9]) for ii in lines if float(ii.split()[13])>=2]
 
 # Texnet 1 month (09)
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet_reloc/texnet_events_20220901_20221001_growclust-cat-cc0.65-ngood6.txt'
 fname='../data/catalogs/texnet_events_20220901_20221001_growclust-cat-cc0.65-ngood6.txt'
-
 fid=open(fname,'r')
 lines=fid.readlines()
 latsom09=[float(ii.split()[22]) for ii in lines] #oy: one year
@@ -174,7 +139,6 @@ depsomr09=[float(ii.split()[9]) for ii in lines if float(ii.split()[13])>=2]
 
 
 # Texnet 1 month (08)
-# fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet_reloc/texnet_events_20220801_20220901_growclust-cat-cc0.65-ngood6.txt'
 fname='../data/catalogs/texnet_events_20220801_20220901_growclust-cat-cc0.65-ngood6.txt'
 fid=open(fname,'r')
 lines=fid.readlines()
@@ -186,21 +150,10 @@ lonsomr08=[float(ii.split()[8]) for ii in lines if float(ii.split()[13])>=2]
 depsomr08=[float(ii.split()[9]) for ii in lines if float(ii.split()[13])>=2]
 
 ## AOI
-lon1=-104.7
-lon2=-103.7
-lat1=31.3
-lat2=31.9
-
 lon1=-104.7-0.1
 lon2=-103.7+0.1
 lat1=31.3-0.05
 lat2=31.9+0.05
-
-#texnet2022wmmd,2022-11-16 21:32:44 (UTC),(31.637,-103.999),NP1:Ml=5.4,Mw=5.3,NP1:110/47/-108;NP2:316/46/-72
-#texnet2022wmog,2022-11-16 22:39:13 (UTC),(31.629,-104.009),Ml=4.0,Mw=3.8,NP1:79/38/-151;NP2:325/72/-55
-#texnet2022wrbx,2022-11-19 10:03:52 (UTC),(31.635,-104.002),Ml=4.0,Mw=3.6,NP1:81/54/-128;NP2:	315/50/-49
-#texnet2022xaxp,2022-11-24 19:14:19 (UTC),(31.634,-103.988),Ml=4.5,Mw=4.3,NP1:70/49/-152;NP2:321/69/-44
-#texnet2022xaxs,2022-11-24 19:19:28 (UTC),(31.627,-104.003),Ml=4.7,Mw=4.4,NP1:122/38/-80;NP2:289/52/-98
 
 plt.figure(figsize=(12,6))
 ax = plt.subplot(2,2,1)
@@ -269,7 +222,7 @@ plt.plot(lonm,latm,'*g',markersize=10);plt.text(lonm,latm,'M4.9',color='g',fonts
 plt.plot(lonc,latc,'*g',markersize=10);plt.text(lonc,latc,'M5.4',color='g',fontsize=10);
 addcounty()
 
-plt.savefig('test_45_delaware_relocation_texnet.png',format='png',dpi=300)
+plt.savefig('test_eqcct_relo_manualvsAI_locvsreloc_onemonth.png',format='png',dpi=300)
 plt.show()
 
 
@@ -342,7 +295,7 @@ plt.plot(lonm,latm,'*g',markersize=10);plt.text(lonm,latm,'M4.9',color='g',fonts
 plt.plot(lonc,latc,'*g',markersize=10);plt.text(lonc,latc,'M5.4',color='g',fontsize=10);
 addcounty()
 
-plt.savefig('test_45_delaware_relocation_1monthcomp.png',format='png',dpi=300)
+plt.savefig('test_eqcct_relo_manualvsAI_oneyear.png',format='png',dpi=300)
 plt.show()
 
 
