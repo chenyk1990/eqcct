@@ -32,23 +32,6 @@ def addcounty():
 	plt.text(-104.4,31.3,'Culberson',fontsize=10,color='#929591')
 	plt.text(-104.0,31.3,'Reeves',fontsize=10,color='#929591')
 	scalebar = ScaleBar(110000,location='lower left');plt.gca().add_artist(scalebar)
-	
-## Test eid info
-# from pylib.texnet import read_events as my_events
-# # eids=['texnet2022wmmd','texnet2022wmog','texnet2022wrbx','texnet2022xaxp','texnet2022xaxs']
-# # cat=my_events(eids)
-# from pylib.texnet import eventlist as myevelist
-# eids=['texnet2022wmmd','texnet2022wmog','texnet2022wrbx','texnet2022xaxp','texnet2022xaxs']
-# eve=myevelist(eids)
-# 
-
-# nop=[float(eve[1].split(',')[19]),float(eve[1].split(',')[20]),float(eve[1].split(',')[21])]
-# nop1=[float(eve[1].split(',')[22]),float(eve[1].split(',')[23]),float(eve[1].split(',')[24])]
-# print(nop,nop1)
-# 
-# eve=myevelist(['texnet2020galz'])
-# nopm=[float(eve[1].split(',')[19]),float(eve[1].split(',')[20]),float(eve[1].split(',')[21])]
-
 
 ## 2022/08
 ## From depth-corrected EQCCT catalog

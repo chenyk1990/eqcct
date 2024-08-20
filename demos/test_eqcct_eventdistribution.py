@@ -17,7 +17,7 @@ f=open('../data/catalogs/delaware_11687_events.csv') #202010
 lines3=f.readlines()
 
 ## Read reported events
-fname=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet__20170101-20230315_on20230315.asc'
+fname='../texnetreported/texnet__20170101-20230315_on20230315.asc'
 
 
 lines1=lines1[1:]
@@ -143,11 +143,11 @@ for nmonth in nmonths:
             eids.append(eid0[ii])
             lines2.append(lines[ii])
     print('Number of Catalog events in AOI is',len(eids))
-    create_catalog(eids,fincatalog=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet_events_20221220.csv',foutcatalog='texnet_events_20221001_20221101.csv');
+    create_catalog(eids,fincatalog='../data/catalogs/texnet_events_20221220.csv',foutcatalog='texnet_events_tmp.csv');
     
     ### plot Catalog events
     
-    f=open('texnet_events_20221001_20221101.csv')
+    f=open('texnet_events_tmp.csv')
     lines=f.readlines()
     lines=lines[1:]
     lats2=[float(ii.split(',')[6]) for ii in lines]
@@ -156,50 +156,7 @@ for nmonth in nmonths:
     mags2=[float(ii.split(',')[4]) for ii in lines]
     rmss2=[float(ii.split(',')[13]) for ii in lines]
     utcs2=[utc.UTCDateTime(ii.split(',')[2]+'T'+ii.split(',')[3]) for ii in lines]
-    
-#     lats2=[float(ii.split()[8]) for ii in lines2]
-#     lons2=[float(ii.split()[9]) for ii in lines2]
-#     deps2=[float(ii.split()[-1]) for ii in lines2]
-#     mags2=[float(ii.split()[7]) for ii in lines2]
-#     utcs2=[utc.UTCDateTime(ii.split('  ')[1]) for ii in lines2]
-    
-#     plt.figure()
-#     plt.plot(x,y,'sr',label='EQCCT');
-#     plt.plot(lons2,lats2,'pk',label='Catalog');
-#     plt.gca().legend(loc='lower right');
-#     plt.gca().set_ylim(ymin=lat1,ymax=lat2);
-#     plt.gca().set_xlim(xmin=lon1,xmax=lon2);
-#     
-#     # plt.plot(xM,yM,'*b',label='Manual',markersize=12);
-#     # plt.text(xM,yM,'Midland',color='b',fontsize=14)
-#     # plt.plot(xO,yO,'*b',label='Manual',markersize=12);
-#     # plt.text(xO,yO,'Odessa',color='b',fontsize=14)
-#     
-#     plt.plot(xO_Orla,yO_Orla,'*b',markersize=12);
-#     plt.text(xO_Orla,yO_Orla+0.025,'Orla, TX',color='b',fontsize=14)
-#      
-#     plt.gca().set_xlabel("Longitude (deg)",fontsize='large', fontweight='normal')
-#     plt.gca().set_ylabel("Latitude (deg)",fontsize='large', fontweight='normal')
-#     
-#     if nmonth == 12:
-#         plt.gca().set_title("28750 Catalog events, Period: 2021/12/01-2022/12/01",fontsize='large', fontweight='normal')
-#         plt.savefig('test_31_eqcct_texnet_continuous_report12_12_old.png',format='png',dpi=300)
-#     
-#     if nmonth == 6:
-#         plt.gca().set_title("14768 Catalog events, Period: 2022/06/01-2022/12/01",fontsize='large', fontweight='normal')
-#         plt.savefig('test_31_eqcct_texnet_continuous_report06_12_old.png',format='png',dpi=300)
-#         
-#     if nmonth == 3:
-#         plt.gca().set_title("8015 Catalog events, Period: 2022/09/01-2022/12/01",fontsize='large', fontweight='normal')
-#         plt.savefig('test_31_eqcct_texnet_continuous_report09_12_old.png',format='png',dpi=300)
-#         
-#     if nmonth == 1:
-#         plt.gca().set_title("2563 Catalog events, Period: 2022/10/01-2022/11/01",fontsize='large', fontweight='normal')
-#         plt.savefig('test_31_eqcct_texnet_continuous_report10_11_old.png',format='png',dpi=300)
-#     
-#     
-#     plt.show()
-    
+        
     #%% compute the density of EQCCT events
     elon_p=x
     elat_p=y
@@ -226,11 +183,7 @@ for nmonth in nmonths:
             glat1=lat+radii;
             keep=np.where((elon_p>=glon0) & (elon_p<=glon1) & (elat_p>=glat0) & (elat_p<=glat1))
             D[i,j]=len(keep[0])
-#     fig=plt.figure()
-#     ax=fig.add_subplot(111)
 
-    
-    
     if nmonth == 12:
         fig=plt.figure(figsize=(14,10))
         ax4=fig.add_subplot(224)
@@ -329,7 +282,7 @@ for nmonth in nmonths:
 #         plt.savefig('test_31_eqcct_texnet_continuous_report10_11.png',format='png',dpi=300,bbox_inches='tight')
 
 
-# plt.savefig('figure1_3monthreport.png',format='png',dpi=300,bbox_inches='tight')
+plt.savefig('test_eqcct_eventdistribution1.png',format='png',dpi=300,bbox_inches='tight')
 plt.show()
 
 #Midland: -102.0779,31.9973
@@ -463,6 +416,6 @@ x1,x2=plt.gca().get_xlim()
 plt.xticks([x1, (x1+x2)/2, x2], ['Aug 1 2022', 'Sep 16 2022', 'Oct 31 2022'])
 # plt.savefig('continuous_day_hist.png',format='png',dpi=300)
 ax4.text(-0.15,1,'(d)',transform=ax4.transAxes,size=20,weight='normal')
-plt.savefig('figure2_3monthreport.png',format='png',dpi=300,bbox_inches='tight')
+plt.savefig('test_eqcct_eventdistribution2.png',format='png',dpi=300,bbox_inches='tight')
 plt.show()
 
