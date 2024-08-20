@@ -4,7 +4,11 @@ import numpy as np
 import sys
 # sys.path.append('./pylib')
 import os
-from pylib.texnet import create_catalog
+from eqcct.texnet import create_catalog
+from eqcct.texnet import get_sta_loc
+from eqcct.texnet import get_sta_locelv
+from pylib.io import asciiwrite
+import pathlib
 import obspy.core.utcdatetime as utc
 
 ## Read EQCCT result
@@ -17,7 +21,7 @@ f=open('../data/catalogs/delaware_11687_events.csv') #202010
 lines3=f.readlines()
 
 ## Read reported events
-fname='../texnetreported/texnet__20170101-20230315_on20230315.asc'
+fname='../data/texnetreported/texnet__20170101-20230315_on20230315.asc'
 
 
 lines1=lines1[1:]
@@ -73,14 +77,6 @@ for nmonth in nmonths:
     xO_Orla=-103.9085
     yO_Orla=31.8248
     
-#     f=open('texnet_events_20221220.csv')
-#     lines=f.readlines()
-#     lines=lines[1:]
-#     lats=[float(ii.split(',')[6]) for ii in lines]
-#     lons=[float(ii.split(',')[8]) for ii in lines]
-#     deps=[float(ii.split(',')[10]) for ii in lines]
-#     eid0=[ii.split(',')[0] for ii in lines]
-#     utcs=[utc.UTCDateTime(ii.split(',')[2]+'T'+ii.split(',')[3]) for ii in lines]
     f=open(fname)
     lines=f.readlines()
     lines=lines[1:-8]
@@ -117,18 +113,8 @@ for nmonth in nmonths:
             eids.append(eid0[ii])
             lines3.append(lines[ii])
     print('Number of Reported events in AOI is',len(eids))
-#     create_report(eids,fincatalog='texnet_events_20221220.csv',foutcatalog='texnet_events_20221001_20221101.csv');
     
     ### plot Reported events
-    
-#     f=open('texnet_events_20221001_20221101.csv')
-#     lines=f.readlines()
-#     lines=lines[1:]
-#     lats2=[float(ii.split(',')[6]) for ii in lines2]
-#     lons2=[float(ii.split(',')[8]) for ii in lines2]
-#     deps2=[float(ii.split(',')[10]) for ii in lines2]
-#     mags2=[float(ii.split(',')[4]) for ii in lines2]
-#     rmss2=[float(ii.split(',')[13]) for ii in lines2]
     
     lats3=[float(ii.split()[8]) for ii in lines3]
     lons3=[float(ii.split()[9]) for ii in lines3]
@@ -302,11 +288,6 @@ lat1=31.5
 lat2=31.9
 
 
-from pylib.texnet import get_sta_loc
-from pylib.texnet import get_sta_locelv
-from pylib.io import asciiwrite
-import pathlib
-	
 # stafile=os.getenv('HOME')+'/30_40/publications/zhang_fangxue/eqcct_figure_files/figure10-11/figure10a/texnet_stations_2022_1019.csv'
 stafile=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet_stations_2022_1019.csv'
 
