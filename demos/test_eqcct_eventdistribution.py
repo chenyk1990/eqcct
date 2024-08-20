@@ -1,33 +1,32 @@
-import matplotlib.pyplot as plt
+
 import numpy as np
-
-import sys
-# sys.path.append('./pylib')
-import os
-from eqcct.texnet import create_catalog
-from eqcct.texnet import get_sta_loc
-from eqcct.texnet import get_sta_locelv
-from pylib.io import asciiwrite
-import pathlib
+import sys,os
+from eqcct.texnet import create_catalog,get_sta_loc,get_sta_locelv
+from eqcct.io import asciiread,asciiwrite
 import obspy.core.utcdatetime as utc
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
-## Read EQCCT result
-f=open('../data/catalogs/delaware_11140_events.csv') #202008
-lines1=f.readlines()
-f=open('../data/catalogs/delaware_10867_events.csv') #202009
-lines2=f.readlines()
-f=open('../data/catalogs/delaware_11687_events.csv') #202010
-# f=open('all_events.csv')
-lines3=f.readlines()
+if3month=False
+
+if if3month==True: #three-month version or one-month version
+	## Read EQCCT result
+	f=open('../data/catalogs/delaware_11140_events.csv') #202008
+	lines1=f.readlines()
+	f=open('../data/catalogs/delaware_10867_events.csv') #202009
+	lines2=f.readlines()
+	f=open('../data/catalogs/delaware_11687_events.csv') #202010
+	lines3=f.readlines()
+	lines1=lines1[1:]
+	lines2=lines2[1:]
+	lines3=lines3[1:]
+	lines=lines1+lines2+lines3;
+else:
+	f=open('../data/catalogs/delaware_11687_events.csv') #202010
+	lines=f.readlines()[1:]
 
 ## Read reported events
 fname='../data/texnetreported/texnet__20170101-20230315_on20230315.asc'
-
-
-lines1=lines1[1:]
-lines2=lines2[1:]
-lines3=lines3[1:]
-lines=lines1+lines2+lines3;
 
 lons1=[float(ii.split(',')[9]) for ii in lines]
 lats1=[float(ii.split(',')[8]) for ii in lines]
@@ -58,8 +57,11 @@ for ii in range(len(lons1)):
 		x.append(lons1[ii])
 		y.append(lats1[ii])
 
-nmonths=[12, 6, 1, 3]
-# nmonths=[1,]
+if if3month == True:
+	nmonths=[12, 6, 1, 3]
+else:
+	nmonths=[12, 6, 3, 1]
+
 for nmonth in nmonths:
     #Midland: -102.0779,31.9973
     xM=-102.0779
@@ -92,13 +94,13 @@ for nmonth in nmonths:
         t2=utc.UTCDateTime(2022, 12, 1, 00, 00, 00, 000000)
     if nmonth == 1:
         t1=utc.UTCDateTime(2022, 10, 1, 00, 00, 00, 000000)
-        t2=utc.UTCDateTime(2022, 11, 1, 00, 00, 00, 000000)
-    if nmonth == 3:
-        t1=utc.UTCDateTime(2022, 8,  1, 00, 00, 00, 000000)
-        t2=utc.UTCDateTime(2022, 11, 1, 00, 00, 00, 000000)   
+        t2=utc.UTCDateTime(2022, 11, 1, 00, 00, 00, 000000)  
     if nmonth == 6:
         t1=utc.UTCDateTime(2022, 6,  1, 00, 00, 00, 000000)
         t2=utc.UTCDateTime(2022, 12, 1, 00, 00, 00, 000000)   
+    if nmonth == 3:
+        t1=utc.UTCDateTime(2022, 8,  1, 00, 00, 00, 000000)
+        t2=utc.UTCDateTime(2022, 11, 1, 00, 00, 00, 000000) 
         
     lon1=-104.7
     lon2=-103.7
@@ -115,7 +117,6 @@ for nmonth in nmonths:
     print('Number of Reported events in AOI is',len(eids))
     
     ### plot Reported events
-    
     lats3=[float(ii.split()[8]) for ii in lines3]
     lons3=[float(ii.split()[9]) for ii in lines3]
     deps3=[float(ii.split()[-1]) for ii in lines3]
@@ -132,7 +133,6 @@ for nmonth in nmonths:
     create_catalog(eids,fincatalog='../data/catalogs/texnet_events_20221220.csv',foutcatalog='texnet_events_tmp.csv');
     
     ### plot Catalog events
-    
     f=open('texnet_events_tmp.csv')
     lines=f.readlines()
     lines=lines[1:]
@@ -193,7 +193,6 @@ for nmonth in nmonths:
     
         plt.gca().set_title("2367 Catalog events, Period: 2021/12/01-2022/12/01",fontsize='large', fontweight='normal')
         ax4.text(-0.25,1,'(d)',transform=ax4.transAxes,size=20,weight='normal')
-#         plt.savefig('test_31_eqcct_texnet_continuous_report12_12.png',format='png',dpi=300,bbox_inches='tight')
     
     if nmonth == 6:
         ax3=fig.add_subplot(223)
@@ -217,7 +216,6 @@ for nmonth in nmonths:
         
         plt.gca().set_title("1379 Catalog events, Period: 2022/06/01-2022/12/01",fontsize='large', fontweight='normal')
         ax3.text(-0.25,1,'(c)',transform=ax3.transAxes,size=20,weight='normal')
-#         plt.savefig('test_31_eqcct_texnet_continuous_report06_12.png',format='png',dpi=300,bbox_inches='tight')
         
     if nmonth == 3:
         ax2=fig.add_subplot(222)
@@ -241,7 +239,6 @@ for nmonth in nmonths:
         
         plt.gca().set_title("567 Catalog events, Period: 2022/08/01-2022/11/01",fontsize='large', fontweight='normal')
         ax2.text(-0.25,1,'(b)',transform=ax2.transAxes,size=20,weight='normal')
-#         plt.savefig('test_31_eqcct_texnet_continuous_report09_12.png',format='png',dpi=300,bbox_inches='tight')
         
     if nmonth == 1:
         ax1=fig.add_subplot(221)
@@ -265,8 +262,6 @@ for nmonth in nmonths:
         
         plt.gca().set_title("215 Catalog events, Period: 2022/10/01-2022/11/01",fontsize='large', fontweight='normal')
         ax1.text(-0.25,1,'(a)',transform=ax1.transAxes,size=20,weight='normal')
-#         plt.savefig('test_31_eqcct_texnet_continuous_report10_11.png',format='png',dpi=300,bbox_inches='tight')
-
 
 plt.savefig('test_eqcct_eventdistribution1.png',format='png',dpi=300,bbox_inches='tight')
 plt.show()
@@ -288,43 +283,30 @@ lat1=31.5
 lat2=31.9
 
 
-# stafile=os.getenv('HOME')+'/30_40/publications/zhang_fangxue/eqcct_figure_files/figure10-11/figure10a/texnet_stations_2022_1019.csv'
-stafile=os.getenv('HOME')+'/chenyk.data2/various/cyksmall/texnet_stations_2022_1019.csv'
-
-p = pathlib.Path(stafile)
-
-stnames = [line.strip().split(',')[0]+'.'+line.strip().split(',')[1] for line in p.read_text().strip().split('\n')[1:]]
+stafile='../data/stations/texnet_stations_2022_1019.csv'
+lines=asciiread(stafile)[1:]
+stnames = [line.strip().split(',')[0]+'.'+line.strip().split(',')[1] for line in lines]
 
 lonlats=get_sta_loc(stnames,stafile=stafile)
 
 
 lines=[]
 for ii in range(len(lonlats)):
-	print('stnames is',stnames[ii])
+# 	print('stnames is',stnames[ii])
 	lon=float(lonlats[ii][0])
 	lat=float(lonlats[ii][1])
 	if lon>=lon1 and lon<=lon2 and lat>=lat1 and lat<=lat2:
 		lines.append(stnames[ii]+' '+str(lon)+' '+str(lat))
-asciiwrite('stations_to_nadine.txt',lines);
 
-### with elevation
-lonlatelvs=get_sta_locelv(stnames,stafile=stafile)
-lines=[]
-for ii in range(len(lonlatelvs)):
-    print('stnames is',stnames[ii])
-    lon=float(lonlatelvs[ii][0])
-    lat=float(lonlatelvs[ii][1])
-    elv=float(lonlatelvs[ii][2])
-    if lon>=lon1 and lon<=lon2 and lat>=lat1 and lat<=lat2:
-        lines.append(stnames[ii]+' '+str(lon)+' '+str(lat)+' '+str(elv))
-asciiwrite('stations_with_elevation.txt',lines);
-
-f=open("stations_to_nadine.txt");
-lines=f.readlines();
 lons=[float(ii.split(" ")[1]) for ii in lines];
 lats=[float(ii.split(" ")[2].split("\n")[0]) for ii in lines];
 names=[ii.split(" ")[0] for ii in lines];
 
+
+if if3month == True:
+	period='Three months'
+else:
+	period='One month'
 
 fig=plt.figure(figsize=(14,10))
 ax1=fig.add_subplot(221)
@@ -333,50 +315,33 @@ for ii in range(len(lines)):
 		
 for ii in range(len(names)):
     plt.text(lons[ii],lats[ii]+0.02,names[ii],color='k',horizontalalignment='center')
-    
-# plt.gca().set_xlim(xmin=-104.65,xmax=-103.7)
-# plt.gca().set_ylim(ymin=31.5,ymax=31.95)
+
 plt.gca().set_xlabel("Longitude (deg)",fontsize='large', fontweight='normal')
 plt.gca().set_ylabel("Latitude (deg)",fontsize='large', fontweight='normal')
 ax1.text(-0.15,1,'(a)',transform=ax1.transAxes,size=20,weight='normal')
    
-
 ax2=fig.add_subplot(222)
 print("mags1:",len(mags1),"mags2",len(mags2),"mags3",len(mags2))
-plt.hist(mags1,30,range=(np.min(mags1),np.max(mags1)),label='EQCCT (three months)',color='lightgray',edgecolor='black',log=True)
-plt.hist(mags3,30,range=(np.min(mags1),np.max(mags1)),label='Reported (three month)',color='lightyellow',edgecolor='black',log=True)
-plt.hist(mags2,30,range=(np.min(mags1),np.max(mags1)),label='Catalog (three months)',color='red',edgecolor='black',log=True)
+plt.hist(mags1,30,range=(np.min(mags1),np.max(mags1)),label='EQCCT (%s)'%period,color='lightgray',edgecolor='black',log=True)
+plt.hist(mags3,30,range=(np.min(mags1),np.max(mags1)),label='Reported (%s)'%period,color='lightyellow',edgecolor='black',log=True)
+plt.hist(mags2,30,range=(np.min(mags1),np.max(mags1)),label='Catalog (%s)'%period,color='red',edgecolor='black',log=True)
 plt.gca().set_xlim(xmin=0,xmax=4);
 plt.gca().legend(loc='upper right');
 plt.gca().set_ylabel("Count",fontsize='large', fontweight='normal')
 plt.gca().set_xlabel("Magnitude (Ml)",fontsize='large', fontweight='normal')
-# plt.savefig('continuous_mag_hist.png',format='png',dpi=300)
 ax2.text(-0.15,1,'(b)',transform=ax2.transAxes,size=20,weight='normal')
 
 ax3=fig.add_subplot(223)
 print("deps1:",len(deps1),"deps2",len(deps2))
 
-plt.hist(deps1,100,range=(np.min(deps1),np.max(deps1)),label='EQCCT (three months)',color='lightgray',edgecolor='black',log=True)
-plt.hist(deps3,100,range=(np.min(deps1),np.max(deps1)),label='Reported (three months)',color='lightyellow',edgecolor='black',log=True)
-plt.hist(deps2,100,range=(np.min(deps1),np.max(deps1)),label='Catalog (three months)',color='red',edgecolor='black',log=True)
+plt.hist(deps1,100,range=(np.min(deps1),np.max(deps1)),label='EQCCT (%s)'%period,color='lightgray',edgecolor='black',log=True)
+plt.hist(deps3,100,range=(np.min(deps1),np.max(deps1)),label='Reported (%s)'%period,color='lightyellow',edgecolor='black',log=True)
+plt.hist(deps2,100,range=(np.min(deps1),np.max(deps1)),label='Catalog (%s)'%period,color='red',edgecolor='black',log=True)
 plt.gca().set_xlim(xmin=0,xmax=20);
 plt.gca().legend(loc='upper right');
 plt.gca().set_ylabel("Count",fontsize='large', fontweight='normal')
 plt.gca().set_xlabel("Depth (km)",fontsize='large', fontweight='normal')
-# plt.savefig('continuous_dep_hist.png',format='png',dpi=300)
 ax3.text(-0.15,1,'(c)',transform=ax3.transAxes,size=20,weight='normal')
-
-## RMS
-# plt.figure;
-# plt.hist(rmss,30,label='EQCCT (three months)',color='b')
-# plt.hist(rmss2,30,label='Catalog (three months)',color='g')
-# plt.gca().set_xlim(xmin=0,xmax=1);
-# plt.gca().legend(loc='lower right');
-# plt.gca().set_ylabel("Count",fontsize='large', fontweight='normal')
-# plt.gca().set_xlabel("RMS (s)",fontsize='large', fontweight='normal')
-# plt.savefig('continuous_mag_hist.png',format='png',dpi=300)
-# plt.show() 
-import matplotlib.dates as mdates
 
 utcs1=[float(ii) for ii in utcs1]
 utcs2=[float(ii) for ii in utcs2]
@@ -384,9 +349,9 @@ utcs3=[float(ii) for ii in utcs3]
 
 ax4=fig.add_subplot(224)
 print("utcs1:",len(utcs1),"utcs2",len(utcs2))
-plt.hist(utcs1,31,range=(np.min(utcs1),np.max(utcs1)),label='EQCCT (three months)',color='lightgray',edgecolor='black',log=True)
-plt.hist(utcs3,31,range=(np.min(utcs1),np.max(utcs1)),label='Reported (three months)',color='lightyellow',edgecolor='black',log=True)
-plt.hist(utcs2,31,range=(np.min(utcs1),np.max(utcs1)),label='Catalog (three months)',color='red',edgecolor='black',log=True)
+plt.hist(utcs1,31,range=(np.min(utcs1),np.max(utcs1)),label='EQCCT (%s)'%period,color='lightgray',edgecolor='black',log=True)
+plt.hist(utcs3,31,range=(np.min(utcs1),np.max(utcs1)),label='Reported (%s)'%period,color='lightyellow',edgecolor='black',log=True)
+plt.hist(utcs2,31,range=(np.min(utcs1),np.max(utcs1)),label='Catalog (%s)'%period,color='red',edgecolor='black',log=True)
 # plt.gca().set_xlim(xmin=0,xmax=30);
 plt.gca().legend(loc='upper right');
 plt.gca().set_ylabel("Number of earthquakes by days",fontsize='large', fontweight='normal')
@@ -394,8 +359,10 @@ plt.gca().set_ylabel("Number of earthquakes by days",fontsize='large', fontweigh
 plt.gca().set_xlim(xmin=min(utcs1),xmax=max(utcs1))
 
 x1,x2=plt.gca().get_xlim()
-plt.xticks([x1, (x1+x2)/2, x2], ['Aug 1 2022', 'Sep 16 2022', 'Oct 31 2022'])
-# plt.savefig('continuous_day_hist.png',format='png',dpi=300)
+if if3month == True:
+	plt.xticks([x1, (x1+x2)/2, x2], ['Aug 1 2022', 'Sep 16 2022', 'Oct 31 2022'])
+else:
+	plt.xticks([x1, (x1+x2)/2, x2], ['Oct 1 2022', 'Oct 16 2022', 'Oct 31 2022'])
 ax4.text(-0.15,1,'(d)',transform=ax4.transAxes,size=20,weight='normal')
 plt.savefig('test_eqcct_eventdistribution2.png',format='png',dpi=300,bbox_inches='tight')
 plt.show()
