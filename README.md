@@ -80,7 +80,7 @@ Or using pip directly from Github
 
 -----------
 ## Examples
-1 Pick the P/S arrivals from an arbitrary waveform (stream) containing an earthquake
+1 Pick the P/S arrivals from an arbitrary waveform (stream) containing an earthquake (please run in the demos/ folder)
 	
 	import obspy.core.utcdatetime as utc
 	from obspy.clients.fdsn import Client
