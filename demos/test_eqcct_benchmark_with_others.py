@@ -106,10 +106,12 @@ transformer_layers = 4
 ##########################################################################################
 ## EQCCT for P-wave arrival prediction
 ##########################################################################################
+
+## Change TXED path below
 test_pwave(input_hdf5= '/Users/chenyk/DATALIB/TXED/TXED_20231111.h5', # here you need to change the input path of your own data
-       input_testset='./data/signalid_random_1.49w.npy',
+       input_testset='../data/tests/signalid_random_1.49w.npy',
        #input_model='/home/g202321530/Yang/Yangtze/EQ_classification/Texas_1/txed-main/demos/EQCCT_P/test_trainer_outputs/models/test_trainer_001.h5',
-       input_model='./model/test_trainer_024.h5',
+       input_model='../ModelPS/test_trainer_024.h5',
        output_name='test_pwave',
        detection_threshold=0.1,                
        P_threshold=0.1,
@@ -126,9 +128,9 @@ test_pwave(input_hdf5= '/Users/chenyk/DATALIB/TXED/TXED_20231111.h5', # here you
 ## EQCCT for S-wave arrival prediction
 ##########################################################################################
 test_swave(input_hdf5='/Users/chenyk/DATALIB/TXED/TXED_20231111.h5', # here you need to change the input path of your own data
-       input_testset='./data/signalid_random_1.49w.npy',
+       input_testset='../data/tests/signalid_random_1.49w.npy',
        #input_model='/home/g202321530/Yang/Yangtze/EQ_classification/Texas_1/txed-main/demos/EQCCT_S/test_trainer_S_outputs/models/test_trainer_S_001.h5',
-       input_model='./model/test_trainer_021.h5',
+       input_model='../ModelPS/test_trainer_021.h5',
        output_name='test_swave',
        S_threshold=0.1, 
        number_of_plots=3,
@@ -146,9 +148,9 @@ test_swave(input_hdf5='/Users/chenyk/DATALIB/TXED/TXED_20231111.h5', # here you 
 ##########################################################################################
 ## EQCCT for P-wave arrival prediction
 test_pwave(input_hdf5= '/Users/chenyk/DATALIB/TXED/TXED_20231111.h5', # here you need to change the input path of your own data
-       input_testset='./data/signalid_random_1.49w.npy',
+       input_testset='../data/tests/signalid_random_1.49w.npy',
        #input_model='/home/g202321530/Yang/Yangtze/EQ_classification/Texas_1/txed-main/demos/EQCCT_P/test_trainer_outputs/models/test_trainer_001.h5',
-       input_model='./model/test_trainer_EQCCT_P_retrain_yangcui.h5',
+       input_model='../ModelPS/test_trainer_EQCCT_P_retrain_yangcui.h5',
        output_name='test_pwave_retrain',
        detection_threshold=0.1,                
        P_threshold=0.1,
@@ -164,8 +166,8 @@ test_pwave(input_hdf5= '/Users/chenyk/DATALIB/TXED/TXED_20231111.h5', # here you
 ##########################################################################################
 ## EQCCT for S-wave arrival prediction
 test_swave(input_hdf5='/Users/chenyk/DATALIB/TXED/TXED_20231111.h5', # here you need to change the input path of your own data
-       input_testset='./data/signalid_random_1.49w.npy',
-       input_model='./model/test_trainer_EQCCT_S_retrain_yangcui.h5',
+       input_testset='../data/tests/signalid_random_1.49w.npy',
+       input_model='../ModelPS/test_trainer_EQCCT_S_retrain_yangcui.h5',
        #input_model='./model/test_trainer_021.h5',
        output_name='test_swave_retrain',
        S_threshold=0.1, 
@@ -274,7 +276,7 @@ def cal_mae_std(input_array, m):
 # please down load the TXED from: https://drive.google.com/drive/folders/1WXVB8ytNB4bOaZ97oq6OmMRyAEg95trp?usp=sharing
 f = h5py.File("/Users/chenyk/DATALIB/TXED/TXED_20231111.h5", 'r')
 # Load randomly selected random id
-event_id = np.load('./data/signalid_random_1.49w.npy')
+event_id = np.load('../data/tests/signalid_random_1.49w.npy')
 
 
 # obtain the P- and S-wave arrivals
@@ -322,7 +324,7 @@ print(bp_signal.shape)
 ## Load the pre-trained model and perform the inference
 learning_rate = 0.001  # Specify your learning rate
 
-Phase_model = load_model('./model/HANet_10w_random_1213_256_50.h5') 
+Phase_model = load_model('../Model/HANet_10w_random_1213_256_50.h5') 
 phase_output = Phase_model.predict(normalized_phase_data)
 P_phase_output = phase_output[:, :, 0]
 S_phase_output = phase_output[:, :, 1]
